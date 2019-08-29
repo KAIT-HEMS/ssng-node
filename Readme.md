@@ -1,9 +1,6 @@
 # SSNG for Node.js
 
-2018.07.17 1st release    
-2019.03.31 update  
-2019.04.11 Change Packet Monitor in a list view  
-2019.04.17 Update for global install of npm
+2018.07.17 v1.0.0 release    
 
 ## Abstract
 SSNG for Node.jsは、ECHONET Liteコマンド送受信ツールである。  
