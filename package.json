@@ -1,0 +1,30 @@
+{
+    "name": "ssng",
+    "version": "0.0.15",
+    "description": "SSNG, a tool for ECHONET Lite packets",
+    "main": "app.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "bin": {
+        "ssng": "./app.js"
+    },
+    "author": {
+        "name": "Hiroyuki Fujita",
+        "email": "hiro.fujita@he.kanagawa-it.ac.jp",
+        "url": "https://github.com/fujita-kait"
+    },
+    "files": [
+        "html/*"
+    ],
+    "keywords": [
+        "Echonet Lite",
+        "SSNG",
+        "KAIT"
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.16.4",
+        "ws": "^6.2.0"
+    }
+}

@@ -1,0 +1,222 @@
+<!-- index.html for SSNG-->
+<!-- 2019.04.11 -->
+
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css">
+<title>SSNG for Node.js</title>
+<style>
+body {
+  padding-top: 1rem;
+}
+.card-deck {
+	margin-bottom: 20px;
+}
+.card-header {
+	padding: 0.1em 1em;
+}
+#packet-monitor-body {
+	margin: 0;
+	padding: 0;
+}
+#packet-list-wrapper {
+	height: 30em;
+	overflow-y: scroll;
+}
+#packet-list li {
+	font-family: Consolas, 'Courier New', Courier, Monaco, monospace;
+	font-size: 90%;
+	padding: 0.2em 1em;
+	cursor: pointer;
+}
+#packet-list li span {
+	display: inline-block;
+}
+#packet-list li span.col1 {
+	width: 5em;
+}
+#packet-list li span.col2 {
+	width: 2em;
+}
+#packet-list li span.col3 {
+	width: 9em;
+}
+#packet-detail-wrapper {
+	padding: 0.5em 1em;
+	border-top: 1px solid #cccccc;
+}
+</style>
+</head>
+
+<body>
+<header>
+</header>
+<main>
+<div class="container" id="app">
+    <div class="card mb-3">
+	<!-- ECHONET Lite Packets -->
+	<!-- ECHONET Lite Packets header-->
+        <div class="card-header py-1">
+            <div class="row">
+                <div class="col-auto h5 mt-2">ECHONET Lite Packets</div>
+<!--                 <div class="col-auto mt-2" id="ipv4" ></div> -->
+                <div class="col-auto mt-2"> {{ipServer}}</div>
+                <div class="col"></div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <div class="onput-group-prepend">
+                            <span class="input-group-text">IP</span>
+                        </div>
+                        <input type="text" class="form-control" v-model="ipData" v-bind:style="ipDataStyle">
+                    </div>
+                </div>
+                <div class="col-auto mt-1 pl-0">
+                    <button type="button" class="btn btn-secondary btn-sm" v-on:click="buttonClickSend" >SEND</button>
+                    <button type="button" class="btn btn-secondary btn-sm" v-on:click="buttonClickSearch">SEARCH</button>
+                </div>
+            </div>
+        </div>
+	<!-- ECHONET Lite Packets body-->
+        <div class="card-body pt-2 pb-2">
+            <form>
+            <div class="form-check form-check-inline mb-2">
+                <input type="radio" class="form-check-input" id="rb_el" v-model="rbInputData" value="el">
+                <label for="rb_el" class="form-check-label">ECHONET Lite Data</label>
+            </div>
+            <div class="form-row align-items-center">
+                <div class="col-3">
+                    <div class="input-group mb-2">
+                          <div class="input-group-prepend">
+                              <div class="input-group-text">DEOJ</div>
+                          </div>
+                          <input type="text" class="form-control" v-model="el.deojData" v-bind:style="deojDataStyle">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">ESV</div>
+                        </div>
+                        <input type="text" class="form-control" v-model="el.esvData" v-bind:style="esvDataStyle">
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">EPC</div>
+                        </div>
+                        <input type="text" class="form-control" v-model="el.epcData" v-bind:style="epcDataStyle">
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                          <div class="input-group-text">EDT</div>
+                        </div>
+                        <input type="text" class="form-control" v-model="el.edtData" v-bind:style="edtDataStyle">
+                    </div>
+                </div>
+            </div>
+            <div class="form-check form-check-inline my-2">
+                <input type="radio" class="form-check-input" id="rb_free" v-model="rbInputData" value="free">
+                <label for="rb_free" class="form-check-label">Free Data</label>
+            </div>
+            <div>
+                <input type="text" class="form-control" v-model="freeData" v-bind:style="freeDataStyle">
+            </div>
+            </form>
+        </div>
+    </div>
+
+	<!-- パケットモニター -->
+	<!-- パケットモニター header-->
+    <div class="card">
+        <div class="card-header py-1">
+            <div class="row">
+                <div class="col-auto h5 mt-2">Packets Monitor</div>
+                <div class="col"></div>
+
+                <div class="col-auto pl-0">
+                    <div class="input-group border ml-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Order</span>
+                        </div>
+                        <div class="form-check form-check-inline pl-2">
+                            <input type="radio" class="form-check-input" id="normalOrder" v-model="rbOrder" value="normalOrder" v-on:change="updateRbOrder">
+                            <label for="normalOrder" class="form-check-label">Normal</label>
+                        </div>
+                        <div class="form-check form-check-inline pl-0 mr-0">
+                            <input type="radio" class="form-check-input" id="reverseOrder" v-model="rbOrder" value="reverseOrder" v-on:change="updateRbOrder">
+                            <label for="reverseOrder" class="form-check-label ">Reverse</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-auto pl-0">
+                    <div class="input-group border">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Filter</div>
+                        </div>
+                        <div class="form-check form-check-inline pl-2">
+                            <input type="checkbox" class="form-check-input" id="showGet" value="showGet" v-model="filters" v-on:change="updateFilters">
+                            <label class="form-check-label" for="showGet">GET</label>
+                        </div>
+                        <div class="form-check form-check-inline pl-0">
+                            <input type="checkbox" class="form-check-input" id="showInf" value="showInf" v-model="filters" v-on:change="updateFilters">
+                            <label class="form-check-label" for="showInf">INF</label>
+                        </div>
+                        <div class="form-check form-check-inline pl-0">
+                            <input type="checkbox" class="form-check-input" id="showGetres" value="showGetres" v-model="filters" v-on:change="updateFilters">
+                            <label class="form-check-label" for="showGetres">GET_RES</label>
+                        </div>
+                        <div class="form-check form-check-inline pl-0 mr-1">
+                            <input type="checkbox" class="form-check-input" id="showSNA" value="showSNA" v-model="filters" v-on:change="updateFilters">
+                            <label class="form-check-label" for="showSNA">SNA</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-auto mt-1 pl-0">
+                    <button type="button" class="btn btn-secondary btn-sm" v-on:click="clearLog">CLEAR</button>
+                    <button type="button" class="btn btn-secondary btn-sm" v-on:click="saveLog">SAVE</button>
+                </div>
+            </div>
+        </div>
+
+	<!-- パケットモニター body -->
+        <div class="card-body" id="packet-monitor-body">
+            <div id="packet-list-wrapper">
+                <ul class="list-group"  id="packet-list" v-on:keyup.stop v-on:keydown.stop>
+                    <li class="list-group-item" id="packet-monitor-header" tabindex="0">
+                        <span class="col1">HH MM SS</span>
+                        <span class="col2">T/R</span>
+                        <span class="col3">IP</span>
+                        <span class="col4">DATA</span>
+                    </li>
+                    <li v-for="packet in packet_list" class="list-group-item" v-bind:id="packet.id" tabindex="0" v-on:focus="showPacketDetail" v-on:keydown="upDownList" >
+                        <span class="col1">{{ packet.timeStamp }}</span>
+                        <span class="col2">{{ packet.direction }}</span>
+                        <span class="col3">{{ packet.address }}</span>
+                        <span class="col4">{{ packet.hex }}</span>
+                    </li>
+                </ul>
+            </div>
+			<div id="packet-detail-wrapper">
+				<packet-detail>{{packetDetail}}</packet-detail>
+			</div>
+        </div>
+
+    </div>
+</div>
+</main>
+
+<script src="/lib/jquery-3.3.1.min.js"></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="/lib/vue.min.js"></script>
+<script src="/lib/vue-router.min.js"></script>
+<script src="/ssng.js"></script>
+</body>
+</html>
